@@ -1,0 +1,251 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  .input-field {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+  }
+
+  /* Hide browser search/reveal icons for passwords */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none;
+  }
+
+  input::-webkit-contacts-auto-fill-button,
+  input::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+  }
+
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-gray-200;
+  }
+
+  .no-copy {
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+  }
+
+  /* Hide password echo (no dots) while keeping placeholder visible */
+  .input-no-echo {
+    color: transparent;
+    text-shadow: 0 0 0 transparent;
+    caret-color: transparent;
+    -webkit-text-fill-color: transparent !important;
+    /* Chromium/Edge */
+    /* Prevent reveal on selection (light or dark themes) */
+    user-select: text;
+  }
+
+  .input-no-echo::selection {
+    color: transparent;
+    background: transparent;
+  }
+
+  .input-no-echo::-moz-selection {
+    color: transparent;
+    background: transparent;
+  }
+
+  /* Guard against autofill or forced colors in Chromium/Edge */
+  .input-no-echo:-webkit-autofill,
+  .input-no-echo:-webkit-autofill:hover,
+  .input-no-echo:-webkit-autofill:focus,
+  .input-no-echo:-webkit-autofill:active {
+    -webkit-text-fill-color: transparent !important;
+    caret-color: transparent;
+    transition: background-color 9999s ease-in-out 0s;
+  }
+
+  .input-no-echo::placeholder {
+    /* Match default placeholder colors */
+    @apply text-gray-400 dark:text-gray-500;
+  }
+}
+
+/* Custom scrollbar */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.sensitive-container {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+/* This class makes content impossible to read instantly when focus is lost */
+.protected-mode {
+  filter: blur(30px) grayscale(100%) !important;
+  transition: none !important;
+  /* Instant blur for snapshots */
+  user-select: none;
+  /* Prevents highlighting text */
+  pointer-events: none;
+  /* Prevents interaction while blurred */
+}
+
+/* Instant black screen for iOS snapshots - faster than React render */
+.protected-mode::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 999998;
+  display: block;
+}
+
+/* Message Micro-interactions */
+@keyframes message-vanish {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+    filter: blur(12px);
+  }
+}
+
+@keyframes message-glow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.6);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.3);
+    transform: scale(1.02);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    transform: scale(1);
+  }
+}
+
+@keyframes message-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.message-vanishing {
+  animation: message-vanish 0.6s forwards cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.message-new {
+  animation: message-appear 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.message-delivered-glow {
+  animation: message-glow 1.2s ease-out;
+}
+
+/* Ghost Watermark System */
+.watermark-layer {
+  position: fixed;
+  top: -50%;
+  /* Oversized to prevent gaps during rotation/scrolling */
+  left: -50%;
+  width: 200%;
+  height: 200%;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 80px;
+
+  transform: rotate(-25deg);
+  pointer-events: none;
+  /* Essential: allows clicking chat buttons underneath */
+  user-select: none;
+  /* Prevents selecting the watermark text */
+  z-index: 9998;
+  /* Above chat, below critical modals if needed */
+
+  /* THEME AGNOSTIC: Automatically inverts based on background color */
+  mix-blend-mode: difference;
+  color: rgba(255, 255, 255, 0.22);
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
+
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  font-weight: 600;
+
+  /* THE DRIFT: Slow, constant movement to deter AI removal */
+  animation: watermark-drift 120s linear infinite;
+}
+
+@keyframes watermark-drift {
+  from {
+    transform: rotate(-25deg) translate(0, 0);
+  }
+
+  to {
+    transform: rotate(-25deg) translate(-200px, 200px);
+  }
+}
+
+.watermark-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  opacity: 1;
+}
